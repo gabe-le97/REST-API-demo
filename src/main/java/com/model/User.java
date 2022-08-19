@@ -22,8 +22,7 @@ public class User {
         super();
     }
 
-    public User(Long id, String firstName, String lastName, Integer age, String country) {
-        this.id = id;
+    public User(String firstName, String lastName, Integer age, String country) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
@@ -32,10 +31,6 @@ public class User {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getFirstName() {

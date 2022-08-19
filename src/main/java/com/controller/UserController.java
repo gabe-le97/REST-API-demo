@@ -20,7 +20,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> findAll() {
-        return new ResponseEntity<List<User>>(userService.findAll(), HttpStatus.OK);
+        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -28,7 +28,7 @@ public class UserController {
         Optional<User> userOpt = userService.findById(id);
 
         if (userOpt.isPresent()) {
-            return new ResponseEntity<User>(userOpt.get(), HttpStatus.OK);
+            return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

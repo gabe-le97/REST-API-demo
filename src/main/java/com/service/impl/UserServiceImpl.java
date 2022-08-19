@@ -6,57 +6,35 @@ import com.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
-    public static List<User> usersList = new ArrayList<>();
-
-    private static Long COUNTER = 1L;
 
     @Autowired
     private UserRepository userRepository;
 
-    static {
-        User user = new User(COUNTER++, "Bimbus", "Boo", 1000, "USA");
-        usersList.add(user);
-        user = new User(COUNTER++, "Plumpus", "Pook", -100000, "Antarctica");
-        usersList.add(user);
-        user = new User(COUNTER++, "Jiggly", "Boof", 20, "Japan");
-        usersList.add(user);
-        user = new User(COUNTER++, "Jiggly", "Boof", 20, "Japan");
-        usersList.add(user);
-    }
-
     @Override
     public List<User> findAll() {
-        return usersList
-                .stream()
-                .sorted(Comparator.comparing(User::getId))
-                .collect(Collectors.toList());
+        return userRepository.findAll();
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return usersList
-                .stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+        return userRepository.findById(id);
     }
 
     @Override
     public void addUser(User user) {
-        user.setId(COUNTER++);
-        usersList.add(user);
+        userRepository.save(user);
     }
 
     @Override
     public Optional<User> updateUser(User user) {
-        Optional<User> userOpt = usersList.stream().filter(u -> u.getId() == user.getId()).findFirst();
+        Optional<User> userOpt = userRepository.findById(user.getId());
 
         if (userOpt.isPresent()) {
             User existingUser = userOpt.get();
@@ -74,12 +52,7 @@ public class UserServiceImpl implements UserService {
                 existingUser.setCountry(user.getCountry());
             }
 
-            usersList
-                    .stream()
-                    .filter(u -> u.getId() != existingUser.getId())
-                    .collect(Collectors.toList());
-            usersList.add(existingUser);
-
+            userRepository.save(existingUser);
             return Optional.of(existingUser);
         }
         return Optional.empty();
@@ -87,16 +60,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> deleteUser(Long id) {
-        Optional<User> userOpt = usersList
-                .stream()
-                .filter(user -> user.getId() == id)
-                .findFirst();
+        Optional<User> userOpt = userRepository.findById(id);
 
         if (userOpt.isPresent()) {
-            usersList = usersList
-                    .stream()
-                    .filter(user -> userOpt.get().getId() != user.getId())
-                    .collect(Collectors.toList());
+            userRepository.delete(userOpt.get());
             return userOpt;
         }
 
